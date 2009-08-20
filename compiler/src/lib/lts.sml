@@ -159,7 +159,7 @@ struct
          val s' = perform_step 5000 lts s last
       in
          if s' <> ~1 andalso (at_end lts s') then true else 
-             (print "ERROR: Trace ended in non-terminating state!\n"; false)
+             (print "WARNING: Trace ended in non-terminating state - specification satisfaction non longer guaranteed\n"; false)
       end 
     | can_perform_h lts s (h::t) =
       let

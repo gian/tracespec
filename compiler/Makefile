@@ -1,4 +1,3 @@
-all: bin/lml
 
-bin/lml: src
+all: 
 	make -C src

@@ -38,9 +38,42 @@ struct
    fun containsVal t1 = contains_h t1 (#va (!env))
    fun containsBe t1 = contains_h t1 (#be (!env))
 
+   (* Pull in action names and types for the language "built in" environment *)
+   (*XXX: This is very fragile.  Needs to be replaced by a more robust solution *)
+   fun loadTopLevel filename =
+     let
+        val fp = TextIO.openIn filename
+        fun readRecord fp = 
+          let
+             val empty = {name="",inty="",outty="",chan="",action=""}
+	     fun process [name,t1,t2,ch,si] = {name=name,inty=t1,outty=t2,chan=ch,action=si}
+               | process _ = empty
+
+             val l = TextIO.inputLine fp
+	     val fields = String.fields (fn #"\t" => true | _ => false) (valOf l)
+             val d = if String.isPrefix "#" (valOf l) orelse (valOf l) = "\n" then readRecord fp else process fields
+          in
+             if d <> empty then d else readRecord fp 
+          end 
+
+        fun insertRecord r = (insertVal (LVar (#name r)) (TyArrow (TyName (#inty r), TyName (#outty r))) ;
+                              insertBe  (LVar (#name r)) ((BTSend(BTIdentifier(#chan r,SOME (TyName "channel")),SOME (TyName (#action r))))))
+
+	fun readAll fp l = let val k = readRecord fp in if (#name k) = "" then l else (readAll fp (k :: l)) end handle Option => l
+     in
+           (app insertRecord (readAll fp []); TextIO.closeIn fp; true)
+     end handle IOException => false
+
+   val r = loadTopLevel "toplevel.conf"
+   val r' = r orelse (loadTopLevel "conf/toplevel.conf")
+   val r'' = r' orelse (loadTopLevel "../conf/toplevel.conf")
+   val r''' = r'' orelse (loadTopLevel "/usr/share/tracespec/toplevel.conf")
+
+   val _ = if r''' then () else (print "WARNING: Could not load top level configuration\n")
+
    (* Set up the top level environment *)
-   val _ = insertVal (LVar "Debug.print_dbg") (TyArrow (TyName "string",TyName "unit"))
-   val _ = insertBe  (LVar "Debug.print_dbg") ((BTSend(BTIdentifier("io",SOME (TyName "channel")),SOME (TyName "Debug.print_dbg"))))
+   val _ = insertVal (LVar "print") (TyArrow (TyName "string",TyName "unit"))
+   val _ = insertBe  (LVar "print") ((BTSend(BTIdentifier("io",SOME (TyName "channel")),SOME (TyName "print"))))
    val _ = insertVal (LVar "open") (TyArrow (TyName "string", TyName "filehandle")) 
    val _ = insertBe  (LVar "open") ((BTSend(BTIdentifier("file",SOME (TyName "channel")),SOME (TyName "open"))))
    val _ = insertVal (LVar "read") (TyArrow (TyName "filehandle", TyName "string")) 
@@ -49,25 +82,6 @@ struct
    val _ = insertBe  (LVar "close") ((BTSend(BTIdentifier("file",SOME (TyName "channel")),SOME (TyName "close"))))
    val _ = insertVal (LVar "feof")  (TyArrow (TyName "filehandle", TyName "bool"))
    val _ = insertBe  (LVar "feof")  (BTSkip)
-
-   (* For the vending machine example *)
-   val _ = insertVal (LVar "insertCoin") (TyArrow (TyName "unit",TyName "unit"))
-   val _ = insertVal (LVar "button1") (TyArrow (TyName "unit",TyName "unit"))
-   val _ = insertVal (LVar "button2") (TyArrow (TyName "unit",TyName "unit"))
-   val _ = insertVal (LVar "takeDrink1") (TyArrow (TyName "unit",TyName "unit"))
-   val _ = insertVal (LVar "takeDrink2") (TyArrow (TyName "unit",TyName "unit"))
-   val _ = insertVal (LVar "coinReturnButton") (TyArrow (TyName "unit",TyName "unit"))
-   val _ = insertVal (LVar "takeCoin") (TyArrow (TyName "unit",TyName "unit"))
-
-   fun mkVMBT n = ((BTSend(BTIdentifier("vm",SOME (TyName "channel")),SOME (TyName n))))
-
-   val _ = insertBe  (LVar "insertCoin") (mkVMBT "insertCoin")
-   val _ = insertBe  (LVar "button1") (mkVMBT "button1")
-   val _ = insertBe  (LVar "button2") (mkVMBT "button2")
-   val _ = insertBe  (LVar "takeDrink1") (mkVMBT "takeDrink1")
-   val _ = insertBe  (LVar "takeDrink2") (mkVMBT "takeDrink2")
-   val _ = insertBe  (LVar "coinReturnButton") (mkVMBT "coinReturnButton")
-   val _ = insertBe  (LVar "takeCoin") (mkVMBT "takeCoin")
 
    fun isval (Integer _) = true
      | isval (String s) = true
@@ -90,7 +104,6 @@ struct
 
    fun ppbenv [] = ""
      | ppbenv (h::t) = ppbenv1 h ^ ppbenv t 
-
 
    fun instTerm (TyPoly x) constr =
        let
