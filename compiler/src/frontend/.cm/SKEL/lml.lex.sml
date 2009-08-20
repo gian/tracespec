@@ -1,2 +1,0 @@
-Skeleton 5
-d2f1ä¢Int"ae"LmlLexFun"i2aä¢Tokens"gp1c"Lml_TOKENS"f4ÿä¢String"ÿä¢Vector"h3aä¢UserDeclarations"è0aä¢Internal"h1aä¢StartStates"ÿ!bbbd2bc2egp1ÿegp2ÿ$ÿ2f4ÿd"Real"ÿÿ$f2ÿÿ$f6d"Char"Cÿ7ÿÿd"CharVector"ÿ$Næ0ÿƒ
