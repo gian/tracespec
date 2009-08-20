@@ -42,6 +42,8 @@ struct
    (*XXX: This is very fragile.  Needs to be replaced by a more robust solution *)
    fun loadTopLevel filename =
      let
+        fun clean s = String.implode (List.filter (fn #"\n" => false | #" " => false | _ => true) (String.explode s))
+
         val fp = TextIO.openIn filename
         fun readRecord fp = 
           let
@@ -50,7 +52,7 @@ struct
                | process _ = empty
 
              val l = TextIO.inputLine fp
-	     val fields = String.fields (fn #"\t" => true | _ => false) (valOf l)
+	     val fields = String.fields (fn #"\t" => true | _ => false) (clean (valOf l))
              val d = if String.isPrefix "#" (valOf l) orelse (valOf l) = "\n" then readRecord fp else process fields
           in
              if d <> empty then d else readRecord fp 

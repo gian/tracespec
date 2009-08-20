@@ -5,7 +5,7 @@ struct
        val (sc,fc) = Spec.check (Behav.btype lmlfile) (ParseSpec.parse specfile)
     in
        if sc andalso fc then (print "Specification satisfied.\n") else ()
-    end
+    end handle (Fail e) => print ("ERROR: " ^ e ^ "\n")
 end
 
 structure Main =

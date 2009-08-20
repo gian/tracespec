@@ -159,14 +159,14 @@ struct
          val s' = perform_step 5000 lts s last
       in
          if s' <> ~1 andalso (at_end lts s') then true else 
-             (print "WARNING: Trace ended in non-terminating state - specification satisfaction non longer guaranteed\n"; false)
+             (raise (Fail ("incomplete trace at: " ^ last)))
       end 
     | can_perform_h lts s (h::t) =
       let
          val s' = perform_step 5000 lts s h 
       in
          (can_perform_h lts s' t)
-      end handle e => false
+      end handle (Fail x) => raise (Fail x) | e => false
 
   fun can_perform lts [] = (true)
     | can_perform lts trace = can_perform_h lts 0 trace
