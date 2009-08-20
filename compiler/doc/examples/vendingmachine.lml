@@ -1,0 +1,6 @@
+
+
+fun main x = let v = insertCoin () in let v' = button1() in takeDrink1()
+
+val _ = main ()
+

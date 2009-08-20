@@ -1,0 +1,2 @@
+Skeleton 5
+d2f4d"Int"d"Spec"d"TextIO"ä¢LrParser"ad"ParseSpec"jh3aä¢SpeclLrVals"jh1aä¢Token"gp2ÿÿgp1e"SpeclLrValsFun"aä¢Lex"jh1ad"STokens"gp2ÿ6d"Tokens"gp1e"SpeclLexFun"ad"SpeclP"jh3aä¢ParserData"gp2ÿ6ÿ‚.aÿ-gp1ÿ-aÿgp1ÿgp1e"Join"h0

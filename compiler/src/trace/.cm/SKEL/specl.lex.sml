@@ -1,0 +1,2 @@
+Skeleton 5
+ae"SpeclLexFun"i2aä¢STokens"gp1c"Specl_TOKENS"f4d"Char"ÿä¢TextIO"ä¢Vector"h3aä¢yyInput"jh3aä¢TIO"gp1ÿ9ad"TSIO"gp2ÿd"StreamIO"ad"TPIO"gp1d"TextPrimIO"è0aä¢UserDeclarations"ÿ‚bbd2egp1ÿ‚f5Cd"IO"ÿÿ‚ÿÿNf0f1ÿ
